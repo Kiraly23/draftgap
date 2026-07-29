@@ -142,21 +142,6 @@ export type Stats = {
     count: number;
 };
 
-// `stats.stats` is a list of [name, flag, average, percentile, rank] tuples
-// (order is not guaranteed), e.g. ["kills", 0, 6.21, 50, 54].
-export function getKdaFromStats(stats: Stats) {
-    function getAverage(name: string) {
-        const stat = stats.stats.find((s) => s[0] === name);
-        return typeof stat?.[2] === "number" ? stat[2] : 0;
-    }
-
-    return {
-        kills: getAverage("kills"),
-        deaths: getAverage("deaths"),
-        assists: getAverage("assists"),
-    };
-}
-
 export type Time = {
     time: { [key: string]: number };
     timeWin: { [key: string]: number };

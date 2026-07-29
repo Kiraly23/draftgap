@@ -21,10 +21,6 @@ export interface AnalyzeDraftConfig {
     ignoreChampionWinrates: boolean;
     riskLevel: RiskLevel;
     minGames: number;
-    usePickBanRateAdjustments: boolean;
-    banRateRatingBonus: number;
-    pickRatePriorScale: number;
-    referencePickRate: number;
 }
 
 export function analyzeDraft(
@@ -37,10 +33,10 @@ export function analyzeDraft(
     const priorGames = priorGamesByRiskLevel[config.riskLevel];
 
     const allyChampionRating = !config.ignoreChampionWinrates
-        ? analyzeChampions(dataset, fullDataset, team, priorGames, config)
+        ? analyzeChampions(dataset, fullDataset, team, priorGames)
         : { totalRating: 0, winrate: 0, championResults: [] };
     const enemyChampionRating = !config.ignoreChampionWinrates
-        ? analyzeChampions(dataset, fullDataset, enemy, priorGames, config)
+        ? analyzeChampions(dataset, fullDataset, enemy, priorGames)
         : { totalRating: 0, winrate: 0, championResults: [] };
 
     const allyDuoRating = analyzeDuos(fullDataset, team, priorGames);
@@ -85,7 +81,6 @@ export function analyzeChampions(
     synergyMatchupDataset: Dataset,
     team: Map<Role, string>,
     priorGames: number,
-    config: AnalyzeDraftConfig,
 ): AnalyzeChampionsResult {
     const championResults: AnalyzeChampionResult[] = [];
     let totalRating = 0;
@@ -97,7 +92,6 @@ export function analyzeChampions(
             role,
             championKey,
             priorGames,
-            config,
         );
 
         championResults.push(championResult);
@@ -116,7 +110,6 @@ export function analyzeChampion(
     role: Role,
     championKey: string,
     priorGames: number,
-    config: AnalyzeDraftConfig,
 ) {
     // Get stats for this patch
     const championData = dataset.championData[championKey];
@@ -139,14 +132,6 @@ export function analyzeChampion(
             ? 0.5
             : fullChampionRoleData.wins / fullChampionRoleData.games;
 
-    // A rarely-played champion/role has a less representative sample than its
-    // game count alone suggests, so widen the prior pull as pick rate drops.
-    const pickRateConfidence = config.usePickBanRateAdjustments
-        ? Math.min(1, roleData.pickRate / 100 / config.referencePickRate)
-        : 1;
-    const effectivePriorGames =
-        priorGames * (1 + config.pickRatePriorScale * (1 - pickRateConfidence));
-
     const stats = addStats(
         {
             wins: roleData.wins,
@@ -155,19 +140,13 @@ export function analyzeChampion(
         // Scale prior stats by winrate of expected rating, as we expect the champion to have a similar winrate to the expected rating
         // We estimate the expected rating to be the rank winrate
         {
-            wins: effectivePriorGames * fullChampionRoleWinrate,
-            games: effectivePriorGames,
+            wins: priorGames * fullChampionRoleWinrate,
+            games: priorGames,
         },
         // TOOD: if 30 days has no games, add other prior games
     );
 
-    let rating = winrateToRating(stats.wins / stats.games);
-
-    // Champions that get banned often never get to prove their winrate in the
-    // data (survivorship bias), so nudge their rating up proportionally.
-    if (config.usePickBanRateAdjustments) {
-        rating += config.banRateRatingBonus * (roleData.banRate / 100);
-    }
+    const rating = winrateToRating(stats.wins / stats.games);
 
     return {
         role,

@@ -6,13 +6,6 @@ import { Role } from "../Role";
 export interface ChampionRoleData {
     games: number;
     wins: number;
-    pickRate: number;
-    banRate: number;
-    kda: {
-        kills: number;
-        deaths: number;
-        assists: number;
-    };
     matchup: Record<Role, Record<string, ChampionMatchupData>>;
     synergy: Record<Role, Record<string, ChampionSynergyData>>;
     damageProfile: ChampionDamageProfile;
@@ -26,13 +19,6 @@ export function defaultChampionRoleData(): ChampionRoleData {
     return {
         games: 0,
         wins: 0,
-        pickRate: 0,
-        banRate: 0,
-        kda: {
-            kills: 0,
-            deaths: 0,
-            assists: 0,
-        },
         matchup: [0, 1, 2, 3, 4].reduce(
             (acc, role) => ({ ...acc, [role]: {} }),
             {},

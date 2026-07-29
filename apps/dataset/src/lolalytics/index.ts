@@ -7,7 +7,7 @@ import {
     defaultChampionRoleData,
 } from "@draftgap/core/src/models/dataset/ChampionRoleData";
 import { LOLALYTICS_ROLES, type LolalyticsRole } from "./roles";
-import { getKdaFromStats, getLolalyticsQwikChampion } from "./qwik";
+import { getLolalyticsQwikChampion } from "./qwik";
 import { getLolalyticsQwikChampion2 } from "./qwik-champion2";
 import type { RiotChampion } from "../riot";
 import {
@@ -110,9 +110,6 @@ export async function getChampionDataFromLolalytics(
                     wins: Math.round(
                         (championData.header.n * championData.header.wr) / 100,
                     ),
-                    pickRate: championData.header.pr,
-                    banRate: championData.header.br,
-                    kda: getKdaFromStats(championData.sidebar.stats),
                     matchup: Object.fromEntries(
                         LOLALYTICS_ROLES.map((role) => {
                             const data = championData.enemy[role];

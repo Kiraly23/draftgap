@@ -130,20 +130,6 @@ export default function SettingsDialog() {
                         }
                     />
                 </div>
-                <div class="flex space-x-16 items-center justify-between mt-2">
-                    <span class="text-lg uppercase">
-                        Adjust ratings using pick/ban rate
-                    </span>
-                    <Switch
-                        checked={config.usePickBanRateAdjustments}
-                        onChange={() =>
-                            setConfig({
-                                usePickBanRateAdjustments:
-                                    !config.usePickBanRateAdjustments,
-                            })
-                        }
-                    />
-                </div>
             </div>
             <div>
                 <h3 class="text-3xl uppercase">UI</h3>
