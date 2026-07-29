@@ -25,7 +25,7 @@ import {
 import type { SummonerSpellData } from "@draftgap/core/src/models/dataset/SummonerSpellData";
 import { EloBracket } from "@draftgap/core/src/models/rank/elo-bracket";
 
-const BATCH_SIZE = 10;
+const BATCH_SIZE = 5;
 
 // TODO: Move to Riot API if exists?
 const STAT_SHARD_DATA = {

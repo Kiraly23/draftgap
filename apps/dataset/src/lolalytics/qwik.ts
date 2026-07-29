@@ -336,7 +336,14 @@ export async function getLolalyticsQwikChampion(
     }
 
     const url = `https://lolalytics.com/lol/${championId}/${vsUrl}build/?${queryParams.toString()}`;
-    const res = await retry(() => fetch(url));
+    const res = await retry(() =>
+        fetch(url, {
+            headers: {
+                "User-Agent":
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            },
+        }),
+    );
     if (!res.ok) {
         throw new Error(
             "Failed to fetch lolalytics champion " + url + " " + res.status,

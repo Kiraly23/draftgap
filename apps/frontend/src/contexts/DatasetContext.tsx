@@ -14,10 +14,13 @@ import { useUser } from "./UserContext";
 
 type DatasetKey = { tier: EloBracket; name: "30-days" | "current-patch" };
 
+const DATASET_BASE_URL =
+    import.meta.env.VITE_DATASET_BASE_URL || "https://bucket.draftgap.com";
+
 const fetchDataset = async ({ tier, name }: DatasetKey) => {
     try {
         const response = await fetch(
-            `https://bucket.draftgap.com/datasets/v${DATASET_VERSION}/${tier}/${name}.json`,
+            `${DATASET_BASE_URL}/datasets/v${DATASET_VERSION}/${tier}/${name}.json`,
         );
         const json = await response.json();
         return json as Dataset;
