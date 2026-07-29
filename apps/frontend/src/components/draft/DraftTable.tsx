@@ -325,6 +325,30 @@ export default function DraftTable() {
                 );
             },
         },
+        {
+            header: "Lane Matchup",
+            accessorFn: (suggestion) => {
+                const match =
+                    suggestion.draftResult.matchupRating.matchupResults.find(
+                        (m) =>
+                            m.roleA === suggestion.role &&
+                            m.roleB === suggestion.role,
+                    );
+                return match?.rating ?? null;
+            },
+            cell: (info) => (
+                <Show
+                    when={info.getValue<number | null>() !== null}
+                    fallback={
+                        <div class="flex justify-end text-neutral-500">–</div>
+                    }
+                >
+                    <div class="flex justify-end">
+                        <RatingText rating={info.getValue<number>()} />
+                    </div>
+                </Show>
+            ),
+        },
         ...(config.showAdvancedWinrates
             ? ([
                   {
