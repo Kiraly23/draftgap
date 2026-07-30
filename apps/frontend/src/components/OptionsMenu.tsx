@@ -29,15 +29,13 @@ type Props = {
 export const OptionsDropdownMenu: Component<Props> = (props) => {
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger>
-                <button
-                    class={cn(
-                        buttonVariants({ variant: "transparent" }),
-                        "px-1 py-2",
-                    )}
-                >
-                    <Icon path={ellipsisVertical} class="w-7" />
-                </button>
+            <DropdownMenuTrigger
+                class={cn(
+                    buttonVariants({ variant: "transparent" }),
+                    "px-1 py-2",
+                )}
+            >
+                <Icon path={ellipsisVertical} class="w-7" />
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-56">
                 <DropdownMenuLabel>Draftgap</DropdownMenuLabel>

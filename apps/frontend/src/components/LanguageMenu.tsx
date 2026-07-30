@@ -19,15 +19,13 @@ export const LanguageDropdownMenu: Component = () => {
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger>
-                <button
-                    class={cn(
-                        buttonVariants({ variant: "transparent" }),
-                        "px-1 py-2",
-                    )}
-                >
-                    <Icon path={language} class="w-7" />
-                </button>
+            <DropdownMenuTrigger
+                class={cn(
+                    buttonVariants({ variant: "transparent" }),
+                    "px-1 py-2",
+                )}
+            >
+                <Icon path={language} class="w-7" />
             </DropdownMenuTrigger>
             <DropdownMenuContent class="w-56">
                 <DropdownMenuLabel>Language</DropdownMenuLabel>

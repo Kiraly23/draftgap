@@ -53,15 +53,13 @@ export function PickOptions(props: { team: Team; index: number }) {
     return (
         <div class="absolute right-0 top-0">
             <DropdownMenu>
-                <DropdownMenuTrigger>
-                    <button
-                        class={cn(
-                            buttonVariants({ variant: "transparent" }),
-                            "px-1 py-2",
-                        )}
-                    >
-                        <Icon path={ellipsisVertical} class="h-7" />
-                    </button>
+                <DropdownMenuTrigger
+                    class={cn(
+                        buttonVariants({ variant: "transparent" }),
+                        "px-1 py-2",
+                    )}
+                >
+                    <Icon path={ellipsisVertical} class="h-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuLabel>
