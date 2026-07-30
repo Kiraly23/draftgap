@@ -29,6 +29,28 @@ import { ChampionDraftAnalysisDialog } from "../dialogs/ChampionDraftAnalysisDia
 import { Team } from "@draftgap/core/src/models/Team";
 import { championName } from "../../utils/i18n";
 
+const TIER_ORDER = [
+    "S+",
+    "S",
+    "S-",
+    "A+",
+    "A",
+    "A-",
+    "B+",
+    "B",
+    "B-",
+    "C+",
+    "C",
+    "C-",
+    "D+",
+    "D",
+    "D-",
+];
+function getTierRank(tier: string) {
+    const index = TIER_ORDER.indexOf(tier);
+    return index === -1 ? TIER_ORDER.length : index;
+}
+
 export default function DraftTable() {
     const { dataset } = useDataset();
     const { selection, pickChampion, select, bans, ownedChampions } =
@@ -272,14 +294,19 @@ export default function DraftTable() {
         },
         {
             header: "Tier",
-            accessorFn: (suggestion) =>
-                dataset()!.championData[suggestion.championKey]?.statsByRole[
-                    suggestion.role
-                ]?.tier ?? "",
-            enableSorting: false,
-            cell: (info) => (
-                <div class="flex justify-end">{info.getValue<string>()}</div>
-            ),
+            accessorFn: (suggestion) => {
+                const tier =
+                    dataset()!.championData[suggestion.championKey]
+                        ?.statsByRole[suggestion.role]?.tier ?? "";
+                return getTierRank(tier);
+            },
+            sortDescFirst: false,
+            cell: (info) => {
+                const tier =
+                    dataset()!.championData[info.row.original.championKey]
+                        ?.statsByRole[info.row.original.role]?.tier ?? "";
+                return <div class="flex justify-end">{tier}</div>;
+            },
         },
         {
             header: "Lane Matchup",
