@@ -110,6 +110,7 @@ export async function getChampionDataFromLolalytics(
                     wins: Math.round(
                         (championData.header.n * championData.header.wr) / 100,
                     ),
+                    tier: championData.header.tier,
                     matchup: Object.fromEntries(
                         LOLALYTICS_ROLES.map((role) => {
                             const data = championData.enemy[role];

@@ -271,6 +271,17 @@ export default function DraftTable() {
                 ),
         },
         {
+            header: "Tier",
+            accessorFn: (suggestion) =>
+                dataset()!.championData[suggestion.championKey]?.statsByRole[
+                    suggestion.role
+                ]?.tier ?? "",
+            enableSorting: false,
+            cell: (info) => (
+                <div class="flex justify-end">{info.getValue<string>()}</div>
+            ),
+        },
+        {
             header: "Lane Matchup",
             accessorFn: (suggestion) => {
                 const match =
