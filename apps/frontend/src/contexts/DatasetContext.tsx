@@ -21,6 +21,7 @@ const fetchDataset = async ({ tier, name }: DatasetKey) => {
     try {
         const response = await fetch(
             `${DATASET_BASE_URL}/datasets/v${DATASET_VERSION}/${tier}/${name}.json`,
+            { cache: "no-store" },
         );
         const json = await response.json();
         return json as Dataset;
