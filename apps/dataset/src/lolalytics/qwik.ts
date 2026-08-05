@@ -142,21 +142,6 @@ export type Stats = {
     count: number;
 };
 
-// `stats.stats` is a list of [name, flag, average, percentile, rank] tuples
-// (order is not guaranteed), e.g. ["kills", 0, 6.21, 50, 54].
-export function getKdaFromStats(stats: Stats) {
-    function getAverage(name: string) {
-        const stat = stats.stats.find((s) => s[0] === name);
-        return typeof stat?.[2] === "number" ? stat[2] : 0;
-    }
-
-    return {
-        kills: getAverage("kills"),
-        deaths: getAverage("deaths"),
-        assists: getAverage("assists"),
-    };
-}
-
 export type Time = {
     time: { [key: string]: number };
     timeWin: { [key: string]: number };
@@ -336,7 +321,14 @@ export async function getLolalyticsQwikChampion(
     }
 
     const url = `https://lolalytics.com/lol/${championId}/${vsUrl}build/?${queryParams.toString()}`;
-    const res = await retry(() => fetch(url));
+    const res = await retry(() =>
+        fetch(url, {
+            headers: {
+                "User-Agent":
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            },
+        }),
+    );
     if (!res.ok) {
         throw new Error(
             "Failed to fetch lolalytics champion " + url + " " + res.status,

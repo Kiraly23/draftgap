@@ -7,7 +7,7 @@ import {
     defaultChampionRoleData,
 } from "@draftgap/core/src/models/dataset/ChampionRoleData";
 import { LOLALYTICS_ROLES, type LolalyticsRole } from "./roles";
-import { getKdaFromStats, getLolalyticsQwikChampion } from "./qwik";
+import { getLolalyticsQwikChampion } from "./qwik";
 import { getLolalyticsQwikChampion2 } from "./qwik-champion2";
 import type { RiotChampion } from "../riot";
 import {
@@ -20,22 +20,45 @@ export async function getChampionDataFromLolalytics(
     champion: RiotChampion,
     tier: EloBracket = DEFAULT_ELO_BRACKET,
 ) {
-    const [championData, champion2Data] = await Promise.all([
-        getLolalyticsQwikChampion(
-            version,
-            champion.id,
-            undefined,
-            undefined,
-            undefined,
-            tier,
-        ),
-        getLolalyticsQwikChampion2(version, champion.id, undefined, tier),
-    ]);
+    let championData, champion2Data;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+            [championData, champion2Data] = await Promise.all([
+                getLolalyticsQwikChampion(
+                    version,
+                    champion.id,
+                    undefined,
+                    undefined,
+                    undefined,
+                    tier,
+                ),
+                getLolalyticsQwikChampion2(
+                    version,
+                    champion.id,
+                    undefined,
+                    tier,
+                ),
+            ]);
+        } catch (e) {
+            console.log(`No data for ${champion.id} (main role)`, e);
+            return undefined;
+        }
 
-    // If data is not available, throw
-    if (!championData.skill6) {
+        // lolalytics occasionally serves a 200 response with the stats
+        // payload stripped out under load; back off and retry a couple
+        // times before treating the champion as genuinely unavailable.
+        if (championData.skill6) break;
+        if (attempt < 3) {
+            console.log(
+                `Empty response for ${champion.id}, retrying (${attempt}/3)`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+        }
+    }
+
+    // If data is not available, give up
+    if (!championData!.skill6) {
         return undefined;
-        //throw new Error("No data available for this champion and patch");
     }
 
     const mainRole = championData.header.lane as LolalyticsRole;
@@ -87,9 +110,7 @@ export async function getChampionDataFromLolalytics(
                     wins: Math.round(
                         (championData.header.n * championData.header.wr) / 100,
                     ),
-                    pickRate: championData.header.pr,
-                    banRate: championData.header.br,
-                    kda: getKdaFromStats(championData.sidebar.stats),
+                    tier: championData.header.tier,
                     matchup: Object.fromEntries(
                         LOLALYTICS_ROLES.map((role) => {
                             const data = championData.enemy[role];

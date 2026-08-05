@@ -18,8 +18,6 @@ import { Icon } from "solid-heroicons";
 import { star } from "solid-heroicons/solid";
 import { star as starOutline } from "solid-heroicons/outline";
 import { RatingText } from "../common/RatingText";
-import { PercentageText } from "../common/PercentageText";
-import { KdaText } from "../common/KdaText";
 import { createMustSelectToast } from "../../utils/toast";
 import { useUser } from "../../contexts/UserContext";
 import { useDraftSuggestions } from "../../contexts/DraftSuggestionsContext";
@@ -30,6 +28,28 @@ import { Dialog } from "../common/Dialog";
 import { ChampionDraftAnalysisDialog } from "../dialogs/ChampionDraftAnalysisDialog";
 import { Team } from "@draftgap/core/src/models/Team";
 import { championName } from "../../utils/i18n";
+
+const TIER_ORDER = [
+    "S+",
+    "S",
+    "S-",
+    "A+",
+    "A",
+    "A-",
+    "B+",
+    "B",
+    "B-",
+    "C+",
+    "C",
+    "C-",
+    "D+",
+    "D",
+    "D-",
+];
+function getTierRank(tier: string) {
+    const index = TIER_ORDER.indexOf(tier);
+    return index === -1 ? TIER_ORDER.length : index;
+}
 
 export default function DraftTable() {
     const { dataset } = useDataset();
@@ -273,57 +293,44 @@ export default function DraftTable() {
                 ),
         },
         {
-            header: "Pick Rate",
-            accessorFn: (suggestion) =>
-                dataset()!.championData[suggestion.championKey]?.statsByRole[
-                    suggestion.role
-                ]?.pickRate ?? 0,
-            cell: (info) => (
-                <div class="flex justify-end">
-                    <PercentageText percentage={info.getValue<number>()} />
-                </div>
-            ),
-        },
-        {
-            header: "Ban Rate",
-            accessorFn: (suggestion) =>
-                dataset()!.championData[suggestion.championKey]?.statsByRole[
-                    suggestion.role
-                ]?.banRate ?? 0,
-            cell: (info) => (
-                <div class="flex justify-end">
-                    <PercentageText percentage={info.getValue<number>()} />
-                </div>
-            ),
-        },
-        {
-            header: "KDA",
+            header: "Tier",
             accessorFn: (suggestion) => {
-                const roleData = dataset()!.championData[
-                    suggestion.championKey
-                ]?.statsByRole[suggestion.role];
-                if (!roleData) return 0;
-                return (
-                    (roleData.kda.kills + roleData.kda.assists) /
-                    (roleData.kda.deaths || 1)
-                );
+                const tier =
+                    dataset()!.championData[suggestion.championKey]
+                        ?.statsByRole[suggestion.role]?.tier ?? "";
+                return getTierRank(tier);
             },
+            sortDescFirst: false,
             cell: (info) => {
-                const roleData = () =>
+                const tier =
                     dataset()!.championData[info.row.original.championKey]
-                        ?.statsByRole[info.row.original.role];
-                return (
-                    <Show when={roleData()}>
-                        <div class="flex justify-end">
-                            <KdaText
-                                kills={roleData()!.kda.kills}
-                                deaths={roleData()!.kda.deaths}
-                                assists={roleData()!.kda.assists}
-                            />
-                        </div>
-                    </Show>
-                );
+                        ?.statsByRole[info.row.original.role]?.tier ?? "";
+                return <div class="flex justify-end">{tier}</div>;
             },
+        },
+        {
+            header: "Lane Matchup",
+            accessorFn: (suggestion) => {
+                const match =
+                    suggestion.draftResult.matchupRating.matchupResults.find(
+                        (m) =>
+                            m.roleA === suggestion.role &&
+                            m.roleB === suggestion.role,
+                    );
+                return match?.rating ?? null;
+            },
+            cell: (info) => (
+                <Show
+                    when={info.getValue<number | null>() !== null}
+                    fallback={
+                        <div class="flex justify-end text-neutral-500">–</div>
+                    }
+                >
+                    <div class="flex justify-end">
+                        <RatingText rating={info.getValue<number>()} />
+                    </div>
+                </Show>
+            ),
         },
         ...(config.showAdvancedWinrates
             ? ([

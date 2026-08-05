@@ -17,10 +17,6 @@ export type DraftGapConfig = {
     riskLevel: RiskLevel;
     minGames: number;
     eloBracket: EloBracket;
-    usePickBanRateAdjustments: boolean;
-    banRateRatingBonus: number;
-    pickRatePriorScale: number;
-    referencePickRate: number;
 
     // DRAFT SUGGESTIONS
     showFavouritesAtTop: boolean;

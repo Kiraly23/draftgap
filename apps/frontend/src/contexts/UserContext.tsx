@@ -18,10 +18,6 @@ const DEFAULT_CONFIG: DraftGapConfig = {
     riskLevel: "medium",
     minGames: 1000,
     eloBracket: DEFAULT_ELO_BRACKET,
-    usePickBanRateAdjustments: false,
-    banRateRatingBonus: 20,
-    pickRatePriorScale: 1,
-    referencePickRate: 0.05,
 
     // UI
     showFavouritesAtTop: false,
